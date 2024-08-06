@@ -20,6 +20,11 @@ class AClimbingSystemCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+public:
+	AClimbingSystemCharacter();
+
+private:
+
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
@@ -44,18 +49,17 @@ class AClimbingSystemCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
-public:
-	AClimbingSystemCharacter();
-	
-
-protected:
+	/** Climb Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ClimbAction;
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
+
+	void OnClimbActionStarted(const FInputActionValue& Value);
 
 protected:
 	// APawn interface
@@ -67,6 +71,7 @@ protected:
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 };

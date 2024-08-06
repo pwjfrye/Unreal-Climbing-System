@@ -91,6 +91,9 @@ void AClimbingSystemCharacter::SetupPlayerInputComponent(UInputComponent* Player
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AClimbingSystemCharacter::Look);
+
+		// Climbing
+		EnhancedInputComponent->BindAction(ClimbAction, ETriggerEvent::Started, this, &AClimbingSystemCharacter::OnClimbActionStarted);
 	}
 	else
 	{
@@ -132,4 +135,9 @@ void AClimbingSystemCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AClimbingSystemCharacter::OnClimbActionStarted(const FInputActionValue& Value)
+{
+	Debug::Print(TEXT("Climb Started"));
 }
