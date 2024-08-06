@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "DebugHelper.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -58,6 +59,8 @@ void AClimbingSystemCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+
+	Debug::Print(TEXT("Character BeginPlay"));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -65,6 +68,8 @@ void AClimbingSystemCharacter::BeginPlay()
 
 void AClimbingSystemCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	Debug::Print(TEXT("Character SetupPlayerInputComponent"));
+
 	// Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
