@@ -142,5 +142,10 @@ void AClimbingSystemCharacter::Look(const FInputActionValue& Value)
 
 void AClimbingSystemCharacter::OnClimbActionStarted(const FInputActionValue& Value)
 {
-	Debug::Print(TEXT("Climb Started"));
+	if (!CustomMovementComponent)
+	{
+		return;
+	}
+
+	CustomMovementComponent->ToggleClimbing();
 }

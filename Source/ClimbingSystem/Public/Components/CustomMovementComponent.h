@@ -4,11 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "CustomMovementComponent.generated.h"
 
-/**
- * 
- */
+UENUM(BlueprintType)
+enum class ECustomMovementMode : uint8
+{
+	MOVE_Climb UMETA(DisplayName = "Climb Mode")
+};
+
 UCLASS()
 class CLIMBINGSYSTEM_API UCustomMovementComponent : public UCharacterMovementComponent
 {
@@ -16,6 +20,10 @@ class CLIMBINGSYSTEM_API UCustomMovementComponent : public UCharacterMovementCom
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void ToggleClimbing();
+	bool CanStartClimbing();
+	bool IsClimbing() const;
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))
@@ -39,9 +47,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))
 	float EyeHeightTraceDistance = 100.f;
 
-	TArray<FHitResult> DoClimbTrace(const FVector& Start, const FVector& End, bool bShowDebugShape = false) const;
-	FHitResult DoEyeHeightTrace(const FVector& Start, const FVector& End, bool bShowDebugShape = false) const;
+	TArray<FHitResult> ClimbableSurfacesTraced;
 
-	void TraceClimbableSurfaces();
-	void TraceEyeHeightSurface();
+	TArray<FHitResult> DoClimbTrace(const FVector& Start, const FVector& End, const EDrawDebugTrace::Type DebugTraceType) const;
+	FHitResult DoEyeHeightTrace(const FVector& Start, const FVector& End, const EDrawDebugTrace::Type DebugTraceType) const;
+
+	bool DetectClimbableSurfaces();
+	bool DetectEyeHeightSurface();
 };
