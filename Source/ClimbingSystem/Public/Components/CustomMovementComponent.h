@@ -33,7 +33,15 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))
 	float ClimbCapsuleTraceDistance = 1.f;
 
-	TArray<FHitResult> DoCapsuleTraceMultiByObject(const FVector& Start, const FVector& End, bool bShowDebugShape = false);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))
+	FVector EyeHeightTraceOffset;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))
+	float EyeHeightTraceDistance = 100.f;
+
+	TArray<FHitResult> DoClimbTrace(const FVector& Start, const FVector& End, bool bShowDebugShape = false) const;
+	FHitResult DoEyeHeightTrace(const FVector& Start, const FVector& End, bool bShowDebugShape = false) const;
 
 	void TraceClimbableSurfaces();
+	void TraceEyeHeightSurface();
 };
