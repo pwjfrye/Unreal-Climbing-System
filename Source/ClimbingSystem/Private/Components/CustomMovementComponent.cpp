@@ -2,6 +2,8 @@
 
 
 #include "Components/CustomMovementComponent.h"
+
+#include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 
@@ -15,13 +17,15 @@ void UCustomMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 TArray<FHitResult> UCustomMovementComponent::DoClimbTrace(const FVector& Start, const FVector& End, bool bShowDebugShape) const
 {
+	auto Scale = UpdatedComponent->GetComponentScale().GetMax();
+
 	TArray<FHitResult> OutHitResults;
 	UKismetSystemLibrary::CapsuleTraceMultiForObjects(
 		this,
 		Start,
 		End,
-		ClimbCapsuleTraceRadius,
-		ClimbCapsuleTraceHalfHeight,
+		ClimbCapsuleTraceRadius * Scale,
+		ClimbCapsuleTraceHalfHeight * Scale,
 		ClimbableSurfaceTraceTypes,
 		false,
 		TArray<AActor*>(),
@@ -54,7 +58,7 @@ FHitResult UCustomMovementComponent::DoEyeHeightTrace(const FVector& Start, cons
 void UCustomMovementComponent::TraceClimbableSurfaces()
 {
 	const FVector Start = UpdatedComponent->GetComponentTransform().TransformPosition(ClimbCapsuleTraceOffset);
-	const FVector End = Start + UpdatedComponent->GetForwardVector() * ClimbCapsuleTraceDistance;
+	const FVector End = UpdatedComponent->GetComponentTransform().TransformPosition(ClimbCapsuleTraceOffset + FVector::ForwardVector * ClimbCapsuleTraceDistance);
 
 	DoClimbTrace(Start, End, true);
 }
@@ -62,7 +66,7 @@ void UCustomMovementComponent::TraceClimbableSurfaces()
 void UCustomMovementComponent::TraceEyeHeightSurface()
 {
 	const FVector Start = UpdatedComponent->GetComponentTransform().TransformPosition(EyeHeightTraceOffset);
-	const FVector End = Start + UpdatedComponent->GetForwardVector() * EyeHeightTraceDistance;
+	const FVector End = UpdatedComponent->GetComponentTransform().TransformPosition(EyeHeightTraceOffset + FVector::ForwardVector * EyeHeightTraceDistance);
 
 	DoEyeHeightTrace(Start, End, true);
 }
