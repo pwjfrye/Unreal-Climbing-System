@@ -48,6 +48,16 @@ void UCustomMovementComponent::PhysCustom(float deltaTime, int32 Iterations)
 	Super::PhysCustom(deltaTime, Iterations);
 }
 
+float UCustomMovementComponent::GetMaxSpeed() const
+{
+	return IsClimbing() ? ClimbingMaxSpeed : Super::GetMaxSpeed();
+}
+
+float UCustomMovementComponent::GetMaxAcceleration() const
+{
+	return IsClimbing() ? ClimbingMaxAcceleration : Super::GetMaxAcceleration();
+}
+
 void UCustomMovementComponent::PhysClimb(float deltaTime, int32 Iterations)
 {
 	if (deltaTime < MIN_TICK_TIME)
@@ -74,8 +84,7 @@ void UCustomMovementComponent::PhysClimb(float deltaTime, int32 Iterations)
 	const FVector Adjusted = Velocity * deltaTime;
 	FHitResult Hit(1.f);
 
-	// Handle climb rotation
-	SafeMoveUpdatedComponent(Adjusted, UpdatedComponent->GetComponentQuat(), true, Hit);
+	SafeMoveUpdatedComponent(Adjusted, GetClimbRotation(deltaTime), true, Hit);
 
 	if (Hit.Time < 1.f)
 	{
@@ -236,4 +245,19 @@ bool UCustomMovementComponent::DetectEyeHeightSurface()
 
 	const auto HitResult = DoEyeHeightTrace(Start, End, EDrawDebugTrace::Persistent);
 	return HitResult.bBlockingHit > 0;
+}
+
+FQuat UCustomMovementComponent::GetClimbRotation(float DeltaTime) const
+{
+	const FQuat CurrentQuat = UpdatedComponent->GetComponentQuat();
+
+	// TODO: Not sure why we would use the root motion's rotation? Is the idea that if you're using root motion, you'd be supplying it the blend parameters...?
+	if (HasAnimRootMotion() || CurrentRootMotion.HasOverrideVelocity())
+	{
+		return CurrentQuat;
+	}
+
+	// TODO: Does this choose z-axis such that its xz-plane contains world z-axis?
+	const FQuat TargetQuat = FRotationMatrix::MakeFromX(-CurrentClimbableSurfaceNormal).ToQuat();
+	return FMath::QInterpTo(CurrentQuat, TargetQuat, DeltaTime, ClimbingRotationInterpSpeed);
 }
