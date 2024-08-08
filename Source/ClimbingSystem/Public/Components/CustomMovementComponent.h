@@ -25,15 +25,8 @@ public:
 	virtual float GetMaxSpeed() const override;
 	virtual float GetMaxAcceleration() const override;
 
-	void PhysClimb(float deltaTime, int32 Iterations);
-
 	void ToggleClimbing();
-	bool CanStartClimbing();
 	bool IsClimbing() const;
-	static bool IsClimbingMovementMode(EMovementMode InMovementMode, uint8 InCustomMode);
-
-	void StartClimbing();
-	void StopClimbing();
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))
@@ -72,6 +65,14 @@ private:
 	TArray<FHitResult> ClimbableSurfacesTraced;
 	FVector CurrentClimbableSurfaceLocation;
 	FVector CurrentClimbableSurfaceNormal;
+
+	void PhysClimb(float deltaTime, int32 Iterations);
+
+	bool CanStartClimbing();
+	static bool IsClimbingMovementMode(EMovementMode InMovementMode, uint8 InCustomMode);
+
+	void StartClimbing();
+	void StopClimbing();
 
 	void ProcessClimbableSurfaceInfo();
 	TArray<FHitResult> DoClimbTrace(const FVector& Start, const FVector& End, const EDrawDebugTrace::Type DebugTraceType) const;
