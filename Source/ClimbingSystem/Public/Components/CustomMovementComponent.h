@@ -23,6 +23,10 @@ public:
 
 	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
 
+	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
+
+	void PhysClimb(float deltaTime, int32 Iterations);
+
 	void ToggleClimbing();
 	bool CanStartClimbing();
 	bool IsClimbing() const;
@@ -52,6 +56,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))
 	float EyeHeightTraceDistance = 100.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))
+	float ClimbingMaxBrakingDeceleration = 400.f;
 
 	TArray<FHitResult> ClimbableSurfacesTraced;
 

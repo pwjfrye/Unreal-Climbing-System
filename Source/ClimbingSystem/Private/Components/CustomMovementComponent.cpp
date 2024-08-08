@@ -38,6 +38,58 @@ void UCustomMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovem
 	Super::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
 }
 
+void UCustomMovementComponent::PhysCustom(float deltaTime, int32 Iterations)
+{
+	if (IsClimbing())
+	{
+		PhysClimb(deltaTime, Iterations);
+	}
+
+	Super::PhysCustom(deltaTime, Iterations);
+}
+
+void UCustomMovementComponent::PhysClimb(float deltaTime, int32 Iterations)
+{
+	if (deltaTime < MIN_TICK_TIME)
+	{
+		return;
+	}
+
+	// Process all climbable surface info
+
+	// Check if we should stop climbing
+
+	RestorePreAdditiveRootMotionVelocity();
+
+	if( !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity() )
+	{
+		// Define max climb speed and acceleration
+		CalcVelocity(deltaTime, 0.f, true, ClimbingMaxBrakingDeceleration);
+	}
+
+	ApplyRootMotionToVelocity(deltaTime);
+
+	FVector OldLocation = UpdatedComponent->GetComponentLocation();
+	const FVector Adjusted = Velocity * deltaTime;
+	FHitResult Hit(1.f);
+
+	// Handle climb rotation
+	SafeMoveUpdatedComponent(Adjusted, UpdatedComponent->GetComponentQuat(), true, Hit);
+
+	if (Hit.Time < 1.f)
+	{
+		HandleImpact(Hit, deltaTime, Adjusted);
+		SlideAlongSurface(Adjusted, (1.f - Hit.Time), Hit.Normal, Hit, true);
+	}
+
+	if(!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity() )
+	{
+		Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / deltaTime;
+	}
+
+	// Snap movement to climbable surfaces
+}
+
 void UCustomMovementComponent::ToggleClimbing()
 {
 	if (IsClimbing())
