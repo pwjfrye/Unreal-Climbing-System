@@ -61,7 +61,10 @@ private:
 	float ClimbingMaxBrakingDeceleration = 400.f;
 
 	TArray<FHitResult> ClimbableSurfacesTraced;
+	FVector CurrentClimbableSurfaceLocation;
+	FVector CurrentClimbableSurfaceNormal;
 
+	void ProcessClimbableSurfaceInfo();
 	TArray<FHitResult> DoClimbTrace(const FVector& Start, const FVector& End, const EDrawDebugTrace::Type DebugTraceType) const;
 	FHitResult DoEyeHeightTrace(const FVector& Start, const FVector& End, const EDrawDebugTrace::Type DebugTraceType) const;
 

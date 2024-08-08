@@ -56,6 +56,7 @@ void UCustomMovementComponent::PhysClimb(float deltaTime, int32 Iterations)
 	}
 
 	// Process all climbable surface info
+	ProcessClimbableSurfaceInfo();
 
 	// Check if we should stop climbing
 
@@ -146,6 +147,39 @@ void UCustomMovementComponent::StopClimbing()
 	SetMovementMode(MOVE_Falling);
 }
 
+void UCustomMovementComponent::ProcessClimbableSurfaceInfo()
+{
+	CurrentClimbableSurfaceLocation = FVector::Zero();
+	CurrentClimbableSurfaceNormal = FVector::Zero();
+
+	if (!DetectClimbableSurfaces())
+	{
+		return;
+	}
+
+	// Compute average of hit surface locations and normals
+	for (const auto& Hit : ClimbableSurfacesTraced)
+	{
+		CurrentClimbableSurfaceLocation += Hit.Location;
+		CurrentClimbableSurfaceNormal += Hit.Normal;
+	}
+
+	CurrentClimbableSurfaceLocation /= ClimbableSurfacesTraced.Num();
+	CurrentClimbableSurfaceNormal = CurrentClimbableSurfaceNormal.GetSafeNormal();
+
+	DrawDebugDirectionalArrow(
+		this->GetWorld(),
+		CurrentClimbableSurfaceLocation,
+		CurrentClimbableSurfaceLocation + CurrentClimbableSurfaceNormal * 100.f,
+		50.f,
+		FColor::Orange,
+		false,
+		-1,
+		0,
+		2
+	);
+}
+
 TArray<FHitResult> UCustomMovementComponent::DoClimbTrace(const FVector& Start, const FVector& End, const EDrawDebugTrace::Type DebugTraceType) const
 {
 	const auto Scale = UpdatedComponent->GetComponentScale().GetMax();
@@ -191,7 +225,7 @@ bool UCustomMovementComponent::DetectClimbableSurfaces()
 	const FVector Start = UpdatedComponent->GetComponentTransform().TransformPosition(ClimbCapsuleTraceOffset);
 	const FVector End = UpdatedComponent->GetComponentTransform().TransformPosition(ClimbCapsuleTraceOffset + FVector::ForwardVector * ClimbCapsuleTraceDistance);
 
-	ClimbableSurfacesTraced = DoClimbTrace(Start, End, EDrawDebugTrace::Persistent);
+	ClimbableSurfacesTraced = DoClimbTrace(Start, End, EDrawDebugTrace::ForOneFrame);
 	return !ClimbableSurfacesTraced.IsEmpty();
 }
 
