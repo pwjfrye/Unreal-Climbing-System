@@ -21,9 +21,15 @@ class CLIMBINGSYSTEM_API UCustomMovementComponent : public UCharacterMovementCom
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
+
 	void ToggleClimbing();
 	bool CanStartClimbing();
 	bool IsClimbing() const;
+	static bool IsClimbingMovementMode(EMovementMode InMovementMode, uint8 InCustomMode);
+
+	void StartClimbing();
+	void StopClimbing();
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))

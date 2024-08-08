@@ -7,10 +7,35 @@
 #include "Kismet/KismetSystemLibrary.h"
 
 #include "ClimbingSystem/DebugHelper.h"
+#include "Components/CapsuleComponent.h"
 
 void UCustomMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+void UCustomMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
+{
+	if (IsClimbing())
+	{
+		// The climbed surface will control the rotation of the character
+		bOrientRotationToMovement = false;
+
+		// The character takes up less space in the climb animation
+		CharacterOwner->GetCapsuleComponent()->SetCapsuleHalfHeight(48.f); // TODO Don't hard-code
+	}
+
+	// Restore settings when leaving climbing
+	if (IsClimbingMovementMode(PreviousMovementMode, PreviousCustomMode))
+	{
+		bOrientRotationToMovement = true;
+		CharacterOwner->GetCapsuleComponent()->SetCapsuleHalfHeight(96.f); // TODO Don't hard-code
+
+		// Zero out velocity from climbing
+		StopMovementImmediately();
+	}
+
+	Super::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
 }
 
 void UCustomMovementComponent::ToggleClimbing()
@@ -18,14 +43,14 @@ void UCustomMovementComponent::ToggleClimbing()
 	if (IsClimbing())
 	{
 		// Exit climb state
-		Debug::Print(TEXT("END CLIMB"));
+		StopClimbing();
 	}
 	else
 	{
 		if (CanStartClimbing())
 		{
 			// Enter climb state
-			Debug::Print(TEXT("START CLIMB"));
+			StartClimbing();
 		}
 		else
 		{
@@ -36,11 +61,6 @@ void UCustomMovementComponent::ToggleClimbing()
 
 bool UCustomMovementComponent::CanStartClimbing()
 {
-	if (IsFalling())
-	{
-		return false;
-	}
-
 	if (!DetectClimbableSurfaces())
 	{
 		return false;
@@ -56,7 +76,22 @@ bool UCustomMovementComponent::CanStartClimbing()
 
 bool UCustomMovementComponent::IsClimbing() const
 {
-	return MovementMode == MOVE_Custom && CustomMovementMode == static_cast<uint8>(ECustomMovementMode::MOVE_Climb);
+	return IsClimbingMovementMode(MovementMode, CustomMovementMode);
+}
+
+bool UCustomMovementComponent::IsClimbingMovementMode(EMovementMode InMovementMode, uint8 InCustomMode)
+{
+	return InMovementMode == MOVE_Custom && InCustomMode == static_cast<uint8>(ECustomMovementMode::MOVE_Climb);
+}
+
+void UCustomMovementComponent::StartClimbing()
+{
+	SetMovementMode(MOVE_Custom, static_cast<uint8>(ECustomMovementMode::MOVE_Climb));
+}
+
+void UCustomMovementComponent::StopClimbing()
+{
+	SetMovementMode(MOVE_Falling);
 }
 
 TArray<FHitResult> UCustomMovementComponent::DoClimbTrace(const FVector& Start, const FVector& End, const EDrawDebugTrace::Type DebugTraceType) const
