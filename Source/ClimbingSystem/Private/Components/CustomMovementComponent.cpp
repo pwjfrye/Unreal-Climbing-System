@@ -69,6 +69,10 @@ void UCustomMovementComponent::PhysClimb(float deltaTime, int32 Iterations)
 	ProcessClimbableSurfaceInfo();
 
 	// Check if we should stop climbing
+	if (CheckShouldStopClimbing())
+	{
+		StopClimbing();
+	}
 
 	RestorePreAdditiveRootMotionVelocity();
 
@@ -145,6 +149,20 @@ bool UCustomMovementComponent::IsClimbing() const
 bool UCustomMovementComponent::IsClimbingMovementMode(EMovementMode InMovementMode, uint8 InCustomMode)
 {
 	return InMovementMode == MOVE_Custom && InCustomMode == static_cast<uint8>(ECustomMovementMode::MOVE_Climb);
+}
+
+bool UCustomMovementComponent::CheckShouldStopClimbing() const
+{
+	if (ClimbableSurfacesTraced.IsEmpty())
+	{
+		return true;
+	}
+
+	const float ClimbSurfaceNormalDotProd = FVector::DotProduct(CurrentClimbableSurfaceNormal, FVector::UpVector);
+	const float ClimbSurfaceNormalPolarAngle = FMath::RadiansToDegrees(FMath::Acos(ClimbSurfaceNormalDotProd));
+
+	Debug::Print(TEXT("Degree Diff: ") + FString::SanitizeFloat(ClimbSurfaceNormalPolarAngle), FColor::Red, 1);
+	return ClimbSurfaceNormalPolarAngle < MinimumClimbableNormalPolarAngle;
 }
 
 void UCustomMovementComponent::StartClimbing()

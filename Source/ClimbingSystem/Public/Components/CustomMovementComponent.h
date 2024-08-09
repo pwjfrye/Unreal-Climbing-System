@@ -64,6 +64,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))
 	float ClimbingRotationInterpSpeed = 5.f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))
+	float MinimumClimbableNormalPolarAngle = 45.f;
+
 	TArray<FHitResult> ClimbableSurfacesTraced;
 	FVector CurrentClimbableSurfaceLocation;
 	FVector CurrentClimbableSurfaceNormal;
@@ -72,6 +75,7 @@ private:
 
 	bool CanStartClimbing();
 	static bool IsClimbingMovementMode(EMovementMode InMovementMode, uint8 InCustomMode);
+	bool CheckShouldStopClimbing() const;
 
 	void StartClimbing();
 	void StopClimbing();
