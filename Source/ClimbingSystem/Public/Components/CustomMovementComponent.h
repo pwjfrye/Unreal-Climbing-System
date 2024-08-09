@@ -82,4 +82,5 @@ private:
 	bool DetectEyeHeightSurface();
 
 	FQuat GetClimbRotation(float DeltaTime) const;
+	void SnapMovementToClimbableSurfaces(float DeltaTime);
 };

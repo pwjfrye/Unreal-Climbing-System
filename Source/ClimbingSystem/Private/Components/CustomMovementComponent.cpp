@@ -98,6 +98,7 @@ void UCustomMovementComponent::PhysClimb(float deltaTime, int32 Iterations)
 	}
 
 	// Snap movement to climbable surfaces
+	SnapMovementToClimbableSurfaces(deltaTime);
 }
 
 void UCustomMovementComponent::ToggleClimbing()
@@ -260,4 +261,20 @@ FQuat UCustomMovementComponent::GetClimbRotation(float DeltaTime) const
 	// TODO: Does this choose z-axis such that its xz-plane contains world z-axis?
 	const FQuat TargetQuat = FRotationMatrix::MakeFromX(-CurrentClimbableSurfaceNormal).ToQuat();
 	return FMath::QInterpTo(CurrentQuat, TargetQuat, DeltaTime, ClimbingRotationInterpSpeed);
+}
+
+void UCustomMovementComponent::SnapMovementToClimbableSurfaces(float DeltaTime)
+{
+	const FVector ComponentForward = UpdatedComponent->GetForwardVector();
+	const FVector ComponentLocation = UpdatedComponent->GetComponentLocation();
+
+	// TODO: Not sure if the math here makes sense; I tried scaling the snap vector to be pretty small and it still works.
+	const FVector ProjectedCharacterToSurface = (CurrentClimbableSurfaceLocation - ComponentLocation).ProjectOnTo(ComponentForward);
+	const FVector SnapVector = -CurrentClimbableSurfaceNormal * ProjectedCharacterToSurface.Length();
+
+	UpdatedComponent->MoveComponent(
+		SnapVector * DeltaTime * ClimbingMaxSpeed,
+		UpdatedComponent->GetComponentQuat(),
+		true
+		);
 }
