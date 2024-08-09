@@ -61,6 +61,9 @@ private:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
+	void HandleGroundMovementInput(const FVector2D& MovementVector);
+	void HandleClimbingMovementInput(const FVector2D& MovementVector);
+
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 

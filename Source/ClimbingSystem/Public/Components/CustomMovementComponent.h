@@ -27,6 +27,8 @@ public:
 
 	void ToggleClimbing();
 	bool IsClimbing() const;
+	FVector GetForwardClimbingDirection() const { return FVector::CrossProduct(-CurrentClimbableSurfaceNormal, UpdatedComponent->GetRightVector()); }
+	FVector GetRightwardClimbingDirection() const { return FVector::CrossProduct(-CurrentClimbableSurfaceNormal, -UpdatedComponent->GetUpVector()); }
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))
