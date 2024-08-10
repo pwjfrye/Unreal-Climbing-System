@@ -45,4 +45,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Reference, meta = (AllowPrivateAccess = "true"))
 	bool bWasJumping;
 	void UpdateWasJumping();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Reference, meta = (AllowPrivateAccess = "true"))
+	int CurrentJumpCount;
+	void UpdateCurrentJumpCount();
 };
