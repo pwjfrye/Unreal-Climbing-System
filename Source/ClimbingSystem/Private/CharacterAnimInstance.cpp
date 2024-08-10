@@ -29,6 +29,7 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	UpdateVerticalVelocity();
 	UpdateShouldMove();
 	UpdateIsFalling();
+	UpdateWasJumping();
 }
 
 void UCharacterAnimInstance::UpdateHorizontalSpeed()
@@ -51,4 +52,9 @@ void UCharacterAnimInstance::UpdateShouldMove()
 void UCharacterAnimInstance::UpdateIsFalling()
 {
 	bIsFalling = CustomMovementComponent->IsFalling();
+}
+
+void UCharacterAnimInstance::UpdateWasJumping()
+{
+	bWasJumping = ClimbingSystemCharacter->bWasJumping;
 }
