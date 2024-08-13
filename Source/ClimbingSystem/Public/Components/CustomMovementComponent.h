@@ -7,6 +7,9 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "CustomMovementComponent.generated.h"
 
+class UAnimMontage;
+class UAnimInstance;
+
 UENUM(BlueprintType)
 enum class ECustomMovementMode : uint8
 {
@@ -19,6 +22,7 @@ class CLIMBINGSYSTEM_API UCustomMovementComponent : public UCharacterMovementCom
 	GENERATED_BODY()
 
 public:
+	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
 	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
@@ -67,6 +71,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))
 	float MinimumClimbableNormalPolarAngle = 45.f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* ClimbFromStandMontage;
+
+	UPROPERTY()
+	UAnimInstance* AnimInstance;
+
 	TArray<FHitResult> ClimbableSurfacesTraced;
 	FVector CurrentClimbableSurfaceLocation;
 	FVector CurrentClimbableSurfaceNormal;
@@ -89,4 +99,9 @@ private:
 
 	FQuat GetClimbRotation(float DeltaTime) const;
 	void SnapMovementToClimbableSurfaces(float DeltaTime);
+
+	void PlayClimbMontage(UAnimMontage* MontageToPlay);
+
+	UFUNCTION()
+	void OnMontageEndedOrBlendingOut(UAnimMontage* Montage, bool BInterrupted);
 };

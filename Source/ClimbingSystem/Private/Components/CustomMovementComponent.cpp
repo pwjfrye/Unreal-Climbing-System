@@ -9,6 +9,18 @@
 #include "ClimbingSystem/DebugHelper.h"
 #include "Components/CapsuleComponent.h"
 
+void UCustomMovementComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AnimInstance = CharacterOwner->GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->OnMontageEnded.AddDynamic(this, &UCustomMovementComponent::OnMontageEndedOrBlendingOut);
+		AnimInstance->OnMontageBlendingOut.AddDynamic(this, &UCustomMovementComponent::OnMontageEndedOrBlendingOut);
+	}
+}
+
 void UCustomMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -167,6 +179,7 @@ bool UCustomMovementComponent::CheckShouldStopClimbing() const
 
 void UCustomMovementComponent::StartClimbing()
 {
+	PlayClimbMontage(ClimbFromStandMontage);
 	SetMovementMode(MOVE_Custom, static_cast<uint8>(ECustomMovementMode::MOVE_Climb));
 }
 
@@ -295,4 +308,29 @@ void UCustomMovementComponent::SnapMovementToClimbableSurfaces(float DeltaTime)
 		UpdatedComponent->GetComponentQuat(),
 		true
 		);
+}
+
+void UCustomMovementComponent::PlayClimbMontage(UAnimMontage* MontageToPlay)
+{
+	if (!MontageToPlay)
+	{
+		return;
+	}
+
+	if (!AnimInstance)
+	{
+		return;
+	}
+
+	if (AnimInstance->IsAnyMontagePlaying())
+	{
+		return;
+	}
+
+	AnimInstance->Montage_Play(MontageToPlay);
+}
+
+void UCustomMovementComponent::OnMontageEndedOrBlendingOut(UAnimMontage* Montage, bool BInterrupted)
+{
+	Debug::Print(TEXT("Climb montage ended"), FColor::Green, 2);
 }
