@@ -180,7 +180,6 @@ bool UCustomMovementComponent::CheckShouldStopClimbing() const
 void UCustomMovementComponent::StartClimbing()
 {
 	PlayClimbMontage(ClimbFromStandMontage);
-	SetMovementMode(MOVE_Custom, static_cast<uint8>(ECustomMovementMode::MOVE_Climb));
 }
 
 void UCustomMovementComponent::StopClimbing()
@@ -332,5 +331,8 @@ void UCustomMovementComponent::PlayClimbMontage(UAnimMontage* MontageToPlay)
 
 void UCustomMovementComponent::OnMontageEndedOrBlendingOut(UAnimMontage* Montage, bool BInterrupted)
 {
-	Debug::Print(TEXT("Climb montage ended"), FColor::Green, 2);
+	if (Montage == ClimbFromStandMontage)
+	{
+		SetMovementMode(MOVE_Custom, static_cast<uint8>(ECustomMovementMode::MOVE_Climb));
+	}
 }
