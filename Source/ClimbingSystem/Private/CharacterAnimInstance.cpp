@@ -32,6 +32,7 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	UpdateWasJumping();
 	UpdateCurrentJumpCount();
 	UpdateIsClimbing();
+	UpdateClimbingVelocity();
 }
 
 void UCharacterAnimInstance::UpdateHorizontalSpeed()
@@ -69,4 +70,9 @@ void UCharacterAnimInstance::UpdateCurrentJumpCount()
 void UCharacterAnimInstance::UpdateIsClimbing()
 {
 	bIsClimbing = CustomMovementComponent->IsClimbing();
+}
+
+void UCharacterAnimInstance::UpdateClimbingVelocity()
+{
+	ClimbingVelocity = CustomMovementComponent->GetUnrotatedClimbingVelocity();
 }

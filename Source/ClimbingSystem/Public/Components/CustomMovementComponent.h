@@ -33,6 +33,7 @@ public:
 	bool IsClimbing() const;
 	FVector GetForwardClimbingDirection() const { return FVector::CrossProduct(-CurrentClimbableSurfaceNormal, UpdatedComponent->GetRightVector()); }
 	FVector GetRightwardClimbingDirection() const { return FVector::CrossProduct(-CurrentClimbableSurfaceNormal, -UpdatedComponent->GetUpVector()); }
+	FVector GetUnrotatedClimbingVelocity();
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement: Climbing", meta = (AllowPrivateAccess = "true"))

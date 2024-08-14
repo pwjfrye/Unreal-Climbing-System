@@ -8,10 +8,13 @@
 
 #include "ClimbingSystem/DebugHelper.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void UCustomMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Debug::Print(TEXT("UpdatedComponent: ") + UpdatedComponent->GetName());
 
 	AnimInstance = CharacterOwner->GetMesh()->GetAnimInstance();
 	if (AnimInstance)
@@ -156,6 +159,43 @@ bool UCustomMovementComponent::CanStartClimbing()
 bool UCustomMovementComponent::IsClimbing() const
 {
 	return IsClimbingMovementMode(MovementMode, CustomMovementMode);
+}
+
+FVector UCustomMovementComponent::GetUnrotatedClimbingVelocity()
+{
+	auto UnrotatedVelocity = UKismetMathLibrary::Quat_UnrotateVector(UpdatedComponent->GetComponentQuat(), Velocity);
+
+	if (!UnrotatedVelocity.IsNearlyZero())
+	{
+		DrawDebugDirectionalArrow(
+			this->GetWorld(),
+			UpdatedComponent->GetComponentLocation(),
+			UpdatedComponent->GetComponentLocation() + UnrotatedVelocity / 4.f,
+			50.f,
+			FColor::Blue,
+			false,
+			-1,
+			0,
+			2
+		);
+	}
+
+	if (!Velocity.IsNearlyZero())
+	{
+		DrawDebugDirectionalArrow(
+			this->GetWorld(),
+			UpdatedComponent->GetComponentLocation(),
+			UpdatedComponent->GetComponentLocation() + Velocity / 4.f,
+			50.f,
+			FColor::White,
+			false,
+			-1,
+			0,
+			2
+		);
+	}
+
+	return UnrotatedVelocity;
 }
 
 bool UCustomMovementComponent::IsClimbingMovementMode(EMovementMode InMovementMode, uint8 InCustomMode)
